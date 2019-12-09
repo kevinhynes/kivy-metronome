@@ -15,7 +15,7 @@ class Metronome(FloatLayout):
         self.starttime = time.time()
         self.stopped = Event()
         self.thread = Thread(target=self.play, daemon=True)
-        self.interval = 0.5
+        self.interval = 0.25
         self.thread.start()
 
     def play(self):
@@ -24,10 +24,7 @@ class Metronome(FloatLayout):
                 print("stopped")
                 self.click.stop()
             print(self.interval - (time.time() - self.starttime) % self.interval)  # should be 0
-            Clock.schedule_once(self.click.play, -1)
-    #
-    # def _play(self, *args):
-    #     self.click.play()
+            self.click.play()
 
     def stop(self):
         self.stopped.set()
