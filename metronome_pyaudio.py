@@ -18,12 +18,12 @@ class Metronome(BoxLayout):
         self.stop_event = Event()
 
         # Prepare sound files
-        self.p = pyaudio.PyAudio()
+        self.player = pyaudio.PyAudio()
         high = wave.open(self.accent_file, "rb")
         low = wave.open(self.beat_file, "rb")
         self.high_data = high.readframes(2048)
         self.low_data = low.readframes(2048)
-        self.stream = self.p.open(format=self.p.get_format_from_width(high.getsampwidth()),
+        self.stream = self.player.open(format=self.player.get_format_from_width(high.getsampwidth()),
                                   channels=high.getnchannels(),
                                   rate=high.getframerate(),
                                   output=True)
@@ -43,10 +43,12 @@ class Metronome(BoxLayout):
             i = (i + 1) % self.time_sig
             self.stop_event.wait(goal - time.time())
             # time.sleep(goal - time.time())
-        self.stop_evnet.clear()
+        self.stop_event.clear()
 
     def stop(self, *args):
         self.stop_event.set()
+        self.stream.close()
+        self.player.terminate()
 
 
 class MetronomeApp(App):
