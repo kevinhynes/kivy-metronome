@@ -11,7 +11,7 @@ class Metronome(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__()
         self.bpm = 120
-        self.spb = (self.bpm/60) ** -1
+        self.spb = (self.bpm / 60) ** -1
         self.time_sig = 4
         self.accent_file = "./sounds/metronome-klack.wav"
         self.beat_file = "./sounds/metronome-click.wav"
@@ -23,15 +23,19 @@ class Metronome(BoxLayout):
         low = wave.open(self.beat_file, "rb")
         self.high_data = high.readframes(2048)
         self.low_data = low.readframes(2048)
-        self.stream = self.player.open(format=self.player.get_format_from_width(high.getsampwidth()),
-                                  channels=high.getnchannels(),
-                                  rate=high.getframerate(),
-                                  output=True)
+        self.stream = self.player.open(
+            format=self.player.get_format_from_width(high.getsampwidth()),
+            channels=high.getnchannels(), rate=high.getframerate(), output=True)
 
         self.add_widget(Button(text="play", on_press=self.play))
         self.add_widget(Button(text="stop", on_press=self.stop))
 
     def play(self, *args):
+        thread = Thread(target=self._play)
+        thread.daemon = True
+        thread.start()
+
+    def _play(self, *args):
         goal = time.time()
         i = 0
         while not self.stop_event.is_set():
@@ -41,14 +45,11 @@ class Metronome(BoxLayout):
                 self.stream.write(self.low_data)
             goal += self.spb
             i = (i + 1) % self.time_sig
-            self.stop_event.wait(goal - time.time())
-            # time.sleep(goal - time.time())
+            self.stop_event.wait(goal - time.time())  # time.sleep(goal - time.time())
         self.stop_event.clear()
 
     def stop(self, *args):
-        self.stop_event.set()
-        self.stream.close()
-        self.player.terminate()
+        self.stop_event.set()  # self.stream.close()  # self.player.terminate()
 
 
 class MetronomeApp(App):
@@ -58,3 +59,4 @@ class MetronomeApp(App):
 
 if __name__ == "__main__":
     MetronomeApp().run()
+
