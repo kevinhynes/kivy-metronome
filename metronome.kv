@@ -1,0 +1,17 @@
+<Metronome>:
+    canvas:
+        Color:
+            rgba: (1, 1, 1, 0.5)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Button:
+        size_hint: [0.2, 0.5]
+        pos_hint: {"left": 0, "bottom": 0}
+        text: "Play"
+        on_press: root.play()
+    Button:
+        size_hint: [0.2, 0.5]
+        pos_hint: {"right": 1, "bottom": 0}
+        text: "Stop"
+        on_press: root.stop()

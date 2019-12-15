@@ -27,8 +27,8 @@ class Metronome(BoxLayout):
             format=self.player.get_format_from_width(high.getsampwidth()),
             channels=high.getnchannels(), rate=high.getframerate(), output=True)
 
-        self.add_widget(Button(text="play", on_press=self.play))
-        self.add_widget(Button(text="stop", on_press=self.stop))
+        # self.add_widget(Button(text="play", on_press=self.play))
+        # self.add_widget(Button(text="stop", on_press=self.stop))
 
     def play(self, *args):
         thread = Thread(target=self._play)
