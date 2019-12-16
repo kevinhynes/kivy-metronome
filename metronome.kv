@@ -1,17 +1,27 @@
 <Metronome>:
+    needle_angle: 0
     canvas:
         Color:
             rgba: (1, 1, 1, 0.5)
         Rectangle:
             size: self.size
             pos: self.pos
-    Button:
-        size_hint: [0.2, 0.5]
-        pos_hint: {"left": 0, "bottom": 0}
-        text: "Play"
-        on_press: root.play()
-    Button:
-        size_hint: [0.2, 0.5]
-        pos_hint: {"right": 1, "bottom": 0}
-        text: "Stop"
-        on_press: root.stop()
+        PushMatrix
+        Rotate:
+            angle: root.needle_angle
+        Color:
+            rgba: (0, 0, 0, 0.5)
+        Rectangle:
+            size: [self.width * 0.05, self.height]
+            pos: [self.width * 0.5 - self.width * 0.025, 0]
+        PopMatrix
+
+    BoxLayout:
+        size_hint: [1, 0.2]
+        pos_hint: {"center_x": 0.5, "bottom": 0}
+        Button:
+            text: "Play"
+            on_press: root.play()
+        Button:
+            text: "Stop"
+            on_press: root.stop()
