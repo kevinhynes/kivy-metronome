@@ -8,17 +8,26 @@
             pos: self.pos
         PushMatrix
         Rotate:
+            angle: self.max_needle_angle
+            axis: 0, 0, 1
+            origin: [self.width*0.5, self.height*0.2]
+        Color:
+            rgba: (0, 0, 0, 1)
+        Line:
+            points: [0, 0, 0, self.]
+        Rotate:
             angle: root.needle_angle
             axis: 0, 0, 1
-            origin: [self.width*0.5, 0]
+            origin: [self.width*0.5, self.height*0.2]
         Color:
             rgba: (0, 0, 0, 0.5)
         Rectangle:
-            size: [self.width * 0.05, self.height]
-            pos: [self.width * 0.5 - self.width * 0.025, 0]
+            size: [self.width * 0.05, self.height*0.75]
+            pos: [self.width * 0.5 - self.width * 0.025, self.height*0.2]
         PopMatrix
 
     BoxLayout:
+        id: buttonbar
         size_hint: [1, 0.2]
         pos_hint: {"center_x": 0.5, "bottom": 0}
         Button:

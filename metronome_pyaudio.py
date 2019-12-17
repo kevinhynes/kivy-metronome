@@ -3,6 +3,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import NumericProperty
 from kivy.animation import Animation
 
+
 from threading import Thread, Event
 import time, wave, pyaudio, math
 
@@ -31,7 +32,7 @@ class Metronome(FloatLayout):
             rate=high.getframerate(),
             output=True)
 
-        self.anim = Animation() + Animation()
+        self.anim = Animation(duration=self.spb) + Animation(duration=self.spb)
         self.anim.repeat = True
         self.anim.bind(on_progress=self.custom_transition)
 
@@ -45,11 +46,11 @@ class Metronome(FloatLayout):
         self.anim.start(self)
         while not self.stop_event.is_set():
             if i == self.time_sig - 1:
+                print(time.time() - goal)
                 self.stream.write(self.high_data)
-                print(time.time() - goal)
             else:
-                self.stream.write(self.low_data)
                 print(time.time() - goal)
+                self.stream.write(self.low_data)
             goal += self.spb
             i = (i + 1) % self.time_sig
             self.stop_event.wait(goal - time.time())
@@ -65,7 +66,8 @@ class Metronome(FloatLayout):
         self.player.terminate()
 
     def custom_transition(self, w, a, progress):
-        self.needle_angle = self.max_needle_angle * math.sin(2*math.pi*progress)
+        self.needle_angle = self.max_needle_angle * math.cos(2*math.pi*progress)
+
 
 class MetronomeApp(App):
     def build(self):
