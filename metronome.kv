@@ -8,14 +8,6 @@
             pos: self.pos
         PushMatrix
         Rotate:
-            angle: self.max_needle_angle
-            axis: 0, 0, 1
-            origin: [self.width*0.5, self.height*0.2]
-        Color:
-            rgba: (0, 0, 0, 1)
-        Line:
-            points: [0, 0, 0, self.]
-        Rotate:
             angle: root.needle_angle
             axis: 0, 0, 1
             origin: [self.width*0.5, self.height*0.2]
