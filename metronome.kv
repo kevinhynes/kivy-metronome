@@ -1,5 +1,6 @@
 <Metronome>:
     needle_angle: 0
+    max_needle_angle: 50
     canvas:
         Color:
             rgba: (1, 1, 1, 0.5)
@@ -7,6 +8,26 @@
             size: self.size
             pos: self.pos
         PushMatrix
+        Rotate:
+            angle: root.max_needle_angle
+            axis: 0, 0, 1
+            origin: [self.width*0.5, self.height*0.2]
+        Color:
+            rgba: (0, 0, 0, 1)
+        Line:
+            points: [self.width//2, self.height*0.2, self.width//2, self.height]
+        Rotate:
+            angle: -root.max_needle_angle*2
+            axis: 0, 0, 1
+            origin: [self.width*0.5, self.height*0.2]
+        Color:
+            rgba: (0, 0, 0, 1)
+        Line:
+            points: [self.width//2, self.height*0.2, self.width//2, self.height]
+        Rotate:
+            angle: root.max_needle_angle
+            axis: 0, 0, 1
+            origin: [self.width*0.5, self.height*0.2]
         Rotate:
             angle: root.needle_angle
             axis: 0, 0, 1

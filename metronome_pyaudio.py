@@ -14,7 +14,7 @@ class Metronome(FloatLayout):
     def __init__(self, **kwargs):
         super().__init__()
         self.bpm = 120
-        self.spb = (self.bpm / 60) ** -1
+        self.spb = 60 / self.bpm
         self.time_sig = 4
         self.max_needle_angle = 50
         self.stop_event = Event()
@@ -32,41 +32,41 @@ class Metronome(FloatLayout):
             rate=high.getframerate(),
             output=True)
 
-        self.anim = Animation(duration=self.spb) + Animation(duration=self.spb)
-        self.anim.repeat = True
-        self.anim.bind(on_progress=self.custom_transition)
-
     def play(self, *args):
         thread = Thread(target=self._play, daemon=True)
         thread.start()
 
     def _play(self, *args):
-        goal = time.time()
-        i = 0
-        self.anim.start(self)
+        '''Update the Metronome's needle angle on every iteration, play beat at appropriate times.
+
+        Since progress goes from 0-1, and beats are being represented by max, min of cos wave,
+        we are constantly traversing 0-pi in the wave. Keep track of parity so we know if needle
+        angle needs to be negative.
+        '''
+        t0 = time.time()
+        beat_num = 0
+        beat_parity = 1
         while not self.stop_event.is_set():
-            if i == self.time_sig - 1:
-                print(time.time() - goal)
-                self.stream.write(self.high_data)
-            else:
-                print(time.time() - goal)
-                self.stream.write(self.low_data)
-            goal += self.spb
-            i = (i + 1) % self.time_sig
-            self.stop_event.wait(goal - time.time())
+            beats_so_far, t_after_b = divmod(time.time() - t0, self.spb)
+            progress = t_after_b / self.spb
+            if beats_so_far > beat_num:
+                beat_num = beats_so_far
+                beat_parity *= -1
+                if beat_num % self.time_sig == 0:
+                    self.stream.write(self.high_data)
+                else:
+                    self.stream.write(self.low_data)
+            self.needle_angle = self.max_needle_angle * math.cos(progress * math.pi) * beat_parity
+            # self.stop_event.wait()
         self.stop_event.clear()
 
     def stop(self, *args):
         self.stop_event.set()
         self.needle_angle = 0
-        self.anim.cancel(self)
 
     def close(self, *args):
         self.stream.close()
         self.player.terminate()
-
-    def custom_transition(self, w, a, progress):
-        self.needle_angle = self.max_needle_angle * math.cos(2*math.pi*progress)
 
 
 class MetronomeApp(App):
