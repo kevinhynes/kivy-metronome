@@ -1,51 +1,47 @@
 <Metronome>:
-    needle_angle: 0
-    max_needle_angle: 50
-    canvas:
-        Color:
-            rgba: (1, 1, 1, 0.5)
-        Rectangle:
-            size: self.size
-            pos: self.pos
-        PushMatrix
-        Rotate:
-            angle: root.max_needle_angle
-            axis: 0, 0, 1
-            origin: [self.width*0.5, self.height*0.2]
-        Color:
-            rgba: (0, 0, 0, 1)
-        Line:
-            points: [self.width//2, self.height*0.2, self.width//2, self.height]
-        Rotate:
-            angle: -root.max_needle_angle*2
-            axis: 0, 0, 1
-            origin: [self.width*0.5, self.height*0.2]
-        Color:
-            rgba: (0, 0, 0, 1)
-        Line:
-            points: [self.width//2, self.height*0.2, self.width//2, self.height]
-        Rotate:
-            angle: root.max_needle_angle
-            axis: 0, 0, 1
-            origin: [self.width*0.5, self.height*0.2]
-        Rotate:
-            angle: root.needle_angle
-            axis: 0, 0, 1
-            origin: [self.width*0.5, self.height*0.2]
-        Color:
-            rgba: (0, 0, 0, 0.5)
-        Rectangle:
-            size: [self.width * 0.05, self.height*0.75]
-            pos: [self.width * 0.5 - self.width * 0.025, self.height*0.2]
-        PopMatrix
-
+    buttonbar: buttonbar
+    box: box
     BoxLayout:
-        id: buttonbar
-        size_hint: [1, 0.2]
-        pos_hint: {"center_x": 0.5, "bottom": 0}
-        Button:
-            text: "Play"
-            on_press: root.play()
-        Button:
-            text: "Stop"
-            on_press: root.stop()
+        id: box
+        size_hint: [None, None]
+        orientation: "vertical"
+        FloatLayout:
+            canvas:
+                Color:
+                    rgba: (1, 1, 1, 0.5)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+                PushMatrix
+                Color:
+                    rgba: (0, 0, 0, 0.5)
+                Translate:
+                    y: -self.height
+                Ellipse:
+                    size: [self.width, self.height*2]
+                    pos: self.pos
+                    angle_start: -root.max_needle_angle
+                    angle_end: root.max_needle_angle
+                PopMatrix
+                PushMatrix
+                Rotate:
+                    angle: root.needle_angle
+                    axis: 0, 0, 1
+                    origin: [self.width*0.5, root.buttonbar.height]
+                Color:
+                    rgba: (0, 0, 0, 0.5)
+                Rectangle:
+                    size: [self.width * 0.02, self.height*0.75]
+                    pos: [self.width * 0.5 - self.width * 0.01, self.height*0.2]
+                PopMatrix
+
+        BoxLayout:
+            id: buttonbar
+            size_hint: [1, 0.2]
+            pos_hint: {"center_x": 0.5, "bottom": 0}
+            Button:
+                text: "Play"
+                on_press: root.play()
+            Button:
+                text: "Stop"
+                on_press: root.stop()

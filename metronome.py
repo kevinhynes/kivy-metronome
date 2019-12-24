@@ -1,7 +1,7 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import NumericProperty
-from kivy.animation import Animation
 
 
 from threading import Thread, Event
@@ -12,11 +12,13 @@ class Metronome(FloatLayout):
     needle_angle = NumericProperty(0)
 
     def __init__(self, **kwargs):
+        self.box = BoxLayout()
+        self.buttonbar = BoxLayout()
+        self.max_needle_angle = 35
         super().__init__()
-        self.bpm = 240
+        self.bpm = 200
         self.spb = 60 / self.bpm
         self.time_sig = 4
-        self.max_needle_angle = 50
         self.stop_event = Event()
         self.accent_file = "./sounds/metronome-klack.wav"
         self.beat_file = "./sounds/metronome-click.wav"
@@ -43,9 +45,10 @@ class Metronome(FloatLayout):
         we are constantly traversing 0-pi in the wave. Keep track of parity so we know if needle
         angle needs to be negative.
         '''
-        start = time.time()
+        testmax = 0
         beat_num = 0
         beat_parity = 1
+        start = time.time()
         while not self.stop_event.is_set():
             beats_so_far, t_after_b = divmod(time.time() - start, self.spb)
             progress = t_after_b / self.spb
@@ -57,7 +60,7 @@ class Metronome(FloatLayout):
                 else:
                     self.stream.write(self.low_data)
             self.needle_angle = self.max_needle_angle * math.cos(progress * math.pi) * beat_parity
-            # self.stop_event.wait()
+            self.stop_event.wait(self.spb/50)  # prevents mouse hover from freezing needle
         self.stop_event.clear()
 
     def stop(self, *args):
@@ -68,6 +71,15 @@ class Metronome(FloatLayout):
         self.stream.close()
         self.player.terminate()
 
+    def on_size(self, *args):
+        target_ratio = 1
+        width, height = self.size
+        if width / height > target_ratio:
+            self.box.height = height
+            self.box.width = target_ratio * height
+        else:
+            self.box.width = width
+            self.box.height = width / target_ratio
 
 class MetronomeApp(App):
     def build(self):
