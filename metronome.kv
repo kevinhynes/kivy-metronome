@@ -1,3 +1,5 @@
+<TitleBar@BoxLayout>:
+
 <BeatBar>:
     canvas:
         Color:
@@ -17,6 +19,8 @@
     box: box
     beatbar: beatbar
     buttonbar: buttonbar
+    titlebar: titlebar
+
     BoxLayout:
         id: box
         size_hint: [None, None]
@@ -27,6 +31,28 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
+        TitleBar:
+            id: titlebar
+            size_hint: [1, 0.2]
+            Button:
+                size_hint: [0.25, 1]
+                text: "-"
+                font_name: "Impact"
+                font_size: 50
+                on_press: metronome.increment_bpm(-1)
+            TextInput:
+                size_hint: [0.5, 1]
+                text: str(metronome.bpm) + " BPM"
+                valign: True
+                halign: "center"
+                font_name: "Impact"
+                font_size: 50
+            Button:
+                size_hint: [0.25, 1]
+                text: "+"
+                font_name: "Impact"
+                font_size: 50
+                on_press: metronome.increment_bpm(1)
         FloatLayout:
             canvas:
                 PushMatrix
