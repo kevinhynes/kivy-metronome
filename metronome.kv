@@ -1,24 +1,29 @@
+
+
 <Metronome>:
-    buttonbar: buttonbar
     box: box
+    beatbar: beatbar
+    buttonbar: buttonbar
     BoxLayout:
         id: box
         size_hint: [None, None]
         orientation: "vertical"
+        canvas:
+            Color:
+                rgba: (1, 1, 1, 0.5)
+            Rectangle:
+                size: self.size
+                pos: self.pos
         FloatLayout:
             canvas:
-                Color:
-                    rgba: (1, 1, 1, 0.5)
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
                 PushMatrix
                 Color:
                     rgba: (0, 0, 0, 0.5)
                 Translate:
                     y: -self.height
+                    x: self.width/2 - self.height
                 Ellipse:
-                    size: [self.width, self.height*2]
+                    size: [self.height*2, self.height*2]
                     pos: self.pos
                     angle_start: -root.max_needle_angle
                     angle_end: root.max_needle_angle
@@ -27,13 +32,29 @@
                 Rotate:
                     angle: root.needle_angle
                     axis: 0, 0, 1
-                    origin: [self.width*0.5, root.buttonbar.height]
+                    origin: [self.width * 0.5, self.y]
                 Color:
                     rgba: (0, 0, 0, 0.5)
                 Rectangle:
-                    size: [self.width * 0.02, self.height*0.75]
-                    pos: [self.width * 0.5 - self.width * 0.01, self.height*0.2]
+                    size: [self.width * 0.02, self.height * 0.75]
+                    pos: [self.width * 0.5 - self.width * 0.01, self.y]
                 PopMatrix
+
+        BeatBar:
+            id: beatbar
+            size_hint: [1, 0.2]
+            canvas:
+                Color:
+                    rgba: (0, 0, 0, 0.5)
+                Line:
+                    points:
+                        [self.x, self.y,
+                        self.x, self.y + self.height,
+                        self.x + self.width, self.y + self.height,
+                        self.x + self.width, self.y,
+                        self.x, self.y]
+                    width: 2
+                    joint: 'round'
 
         BoxLayout:
             id: buttonbar
