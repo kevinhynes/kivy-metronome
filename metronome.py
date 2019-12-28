@@ -1,7 +1,7 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import NumericProperty, ListProperty
+from kivy.properties import NumericProperty
 from kivy.graphics import Ellipse, Color, InstructionGroup
 
 from threading import Thread, Event
@@ -10,12 +10,12 @@ import time, wave, pyaudio, math
 
 class BeatMarker(InstructionGroup):
 
-    def __init__(self, cx, cy, r, **kwargs):
+    def __init__(self, cx=1, cy=1, r=1, **kwargs):
         super().__init__()
-        self.anim_color = Color()
-        self.anim_circle = Ellipse(pos=[cx, cy], size=[2*r, 2*r])
-        self.color = Color()
-        self.marker = Ellipse(pos=[cx, cy], size=[2*r, 2*r])
+        self.anim_color = Color(0, 1, 0, 0)
+        self.anim_circle = Ellipse()
+        self.color = Color(1, 1, 1, 0.5)
+        self.marker = Ellipse()
 
         self.add(self.anim_color)
         self.add(self.anim_circle)
@@ -45,6 +45,8 @@ class BeatMarker(InstructionGroup):
         self.anim_circle.size = size
         self.marker.size = size
 
+    def initiate_animation(self):
+        self.anim_color.a = 1
 
     def update_animation(self, progress):
         rdiff = progress * self.max_rdiff
@@ -64,35 +66,57 @@ class BeatBar(FloatLayout):
         r = (self.height / 2) * 0.75
         rdiff = self.height / 2 - r
         cx, cy = self.x + rdiff, self.y + rdiff
-        step_x = self.width / 4
+        step_x = self.width / self.num_beats
         for i in range(self.num_beats):
             beatmarker = BeatMarker(cx, cy, r)
             self.beatmarkers.add(beatmarker)
             cx += step_x
         self.canvas.add(self.beatmarkers)
 
-    # def on_num_beats(self):
-    #     self.circles.clear()
-    #     r = (self.height / 2) * 0.75
-    #     rdiff = self.height / 2 - r
-    #     step_x = self.width / 4
-    #     for i in range(self.num_beats):
-    #         circle = Ellipse(pos=[self.x + rdiff + i * step_x , self.y + rdiff])
-    #         self.circles.append(circle)
-    #         self.canvas.add(circle)
-
-    def on_size(self, *args):
+    def on_num_beats(self, instance, num_beats):
+        while num_beats > len(self.beatmarkers.children):
+            beatmarker = BeatMarker()
+            self.beatmarkers.add(beatmarker)
+        while num_beats < len(self.beatmarkers.children):
+            self.beatmarkers.children.pop()
         r = (self.height / 2) * 0.75
         rdiff = self.height / 2 - r
         cx, cy = self.x + rdiff, self.y + rdiff
         step_x = self.width / self.num_beats
         for beatmarker in self.beatmarkers.children:
-            beatmarker.pos = [cx, cy]
-            beatmarker.size = [2*r, 2*r]
+            beatmarker.pos = cx, cy
+            beatmarker.size = 2*r, 2*r
             cx += step_x
+
+    def on_size(self, *args):
+        target_ratio = self.num_beats / 1
+        aspect_ratio = self.width / self.height
+        if aspect_ratio > target_ratio:
+            side = self.height
+            r = side / 2 * 0.5
+            rdiff = side / 2 - r
+            dx = (self.width - (self.num_beats * side)) / 2
+            cx, cy = self.x + dx + rdiff, self.y + rdiff
+            step_x = side
+            for beatmarker in self.beatmarkers.children:
+                beatmarker.pos = [cx, cy]
+                beatmarker.size = [2*r, 2*r]
+                cx += step_x
+        else:
+            side = self.width / self.num_beats
+            r = side / 2 * 0.5
+            rdiff = side / 2 - r
+            dy = (self.height - side) / 2
+            cx, cy = self.x + rdiff, self.y + dy + rdiff
+            step_x = side
+            for beatmarker in self.beatmarkers.children:
+                beatmarker.pos = [cx, cy]
+                beatmarker.size = [2*r, 2*r]
+                cx += step_x
 
 class Metronome(FloatLayout):
     needle_angle = NumericProperty(0)
+    num_beats = NumericProperty(4)
 
     def __init__(self, **kwargs):
         self.box = BoxLayout()
@@ -129,7 +153,6 @@ class Metronome(FloatLayout):
         we are constantly traversing 0-pi in the wave. Keep track of parity so we know if needle
         angle needs to be negative.
         '''
-        testmax = 0
         beat_num = 0
         beat_parity = 1
         start = time.time()
@@ -164,6 +187,7 @@ class Metronome(FloatLayout):
         else:
             self.box.width = width
             self.box.height = width / target_ratio
+
 
 class MetronomeApp(App):
     def build(self):

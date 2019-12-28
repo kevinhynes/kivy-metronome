@@ -1,6 +1,19 @@
-
+<BeatBar>:
+    canvas:
+        Color:
+            rgba: (0, 0, 0, 0.5)
+        Line:
+            points:
+                [self.x, self.y,
+                self.x, self.y + self.height,
+                self.x + self.width, self.y + self.height,
+                self.x + self.width, self.y]
+            width: 2
+            joint: 'round'
+            close: True
 
 <Metronome>:
+    id: metronome
     box: box
     beatbar: beatbar
     buttonbar: buttonbar
@@ -43,18 +56,7 @@
         BeatBar:
             id: beatbar
             size_hint: [1, 0.2]
-            canvas:
-                Color:
-                    rgba: (0, 0, 0, 0.5)
-                Line:
-                    points:
-                        [self.x, self.y,
-                        self.x, self.y + self.height,
-                        self.x + self.width, self.y + self.height,
-                        self.x + self.width, self.y,
-                        self.x, self.y]
-                    width: 2
-                    joint: 'round'
+            num_beats: metronome.num_beats
 
         BoxLayout:
             id: buttonbar
@@ -66,3 +68,5 @@
             Button:
                 text: "Stop"
                 on_press: root.stop()
+
+
