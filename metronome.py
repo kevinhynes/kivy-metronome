@@ -102,7 +102,7 @@ class BeatMarker(InstructionGroup):
             self.anim_circle.pos = cx - rdiff, cy - rdiff
             self.anim_circle.size = [2 * (self.r + rdiff), 2 * (self.r + rdiff)]
             self.anim_color.a = progress
-            # self.stop_event.wait(spb/100000)  # stops markers from freezing on hover?
+            self.stop_event.wait(spb/100000)  # stops markers from freezing on hover?
         self._end_animation()
 
     def _end_animation(self, *args):
@@ -172,7 +172,7 @@ import numpy as np
 from scipy.io import wavfile
 sps = 44100
 freq_hz = 660.0
-duration_s = 0.01
+duration_s = 0.2
 each_sample_number = np.arange(duration_s * sps)
 waveform = np.sin(2 * np.pi * each_sample_number * freq_hz / sps)
 waveform_quiet = waveform * 0.3
@@ -216,9 +216,9 @@ class Metronome(FloatLayout):
         self.beat_data = beat.readframes(2048)
         self.sine_data = sine.readframes(2048)
         self.stream = self.player.open(
-            format=self.player.get_format_from_width(accent.getsampwidth()),
-            channels=accent.getnchannels(),
-            rate=accent.getframerate(),
+            format=self.player.get_format_from_width(sine.getsampwidth()),
+            channels=sine.getnchannels(),
+            rate=sine.getframerate(),
             output=True)
 
         self.is_active = False
@@ -249,8 +249,7 @@ class Metronome(FloatLayout):
                 # [1] Use wave and pyaudio modules to play chunk of real metronome .wav file.
                 # Works, but 1) imperfect timing due to using a real sound sample and 2) sound
                 # played is somehow not the same everytime - tends to change slightly.
-                self.stream.write(self.accent_data)
-
+                # self.stream.write(self.accent_data)
 
                 # [2] Use simpleaudio to play NumPy array directly.
                 # Works, but prevents metronome needle from moving smoothly regardless of using wait_done().
@@ -260,7 +259,7 @@ class Metronome(FloatLayout):
 
                 # [3] Use SciPy to write NumPy array to .wav file, wave to open and read, pyaudio to play.
                 # Does not work correctly at all.  Changes to duration_s above affect it.
-                # self.stream.write(self.sine_data)
+                self.stream.write(self.sine_data)
 
                 beatmarker.animate(self, 0.1)
                 beatmarker = self.beatbar.beatmarkers.children[beat_num % self.num_beats]
