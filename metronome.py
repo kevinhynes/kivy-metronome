@@ -43,8 +43,6 @@ class BeatMarker(InstructionGroup):
         self.pos = cx, cy
         self.size = [2*r, 2*r]
 
-        self.stop_event = Event()
-
     @property
     def pos(self):
         return self.pos
@@ -75,10 +73,10 @@ class BeatMarker(InstructionGroup):
 
     def end_animation(self, animation, metronome):
         self.anim_color.a = 0
-        cx, cy = self.marker.pos
-        d, d = self.marker.size
-        self.anim_circle.pos = cx, cy
-        self.anim_circle.size = d, d
+        # cx, cy = self.marker.pos
+        # d, d = self.marker.size
+        self.anim_circle.pos = self.marker.pos
+        self.anim_circle.size = self.marker.size
 
 
 class BeatBar(FloatLayout):
@@ -147,6 +145,7 @@ waveform_integers = np.int16(waveform_quiet * 32767)
 # Write the .wav file
 wavfile.write('sine.wav', sps, waveform_integers)
 
+
 # simpleaudio can play NumPy arrays directly.
 import simpleaudio as sa
 # Start playback
@@ -212,19 +211,13 @@ class Metronome(FloatLayout):
             self.box.width = width
             self.box.height = width / target_ratio
 
+    def on_bpm(self, instance, bpm):
+        self.spb = 60 / self.bpm
+        self.stop()
+
     def increment_bpm(self, val):
         if 1 < self.bpm < 300:
             self.bpm += val
-
-    def on_bpm(self, instance, bpm):
-        self.spb = 60 / self.bpm
-        # was_active = False
-        # if not self.stopped:
-        #     was_active = True
-        #     self.stop()
-        # if was_active:
-        #     time.sleep(0.1)
-        #     self.play()
 
     def _play(self):
         start = time.time()
